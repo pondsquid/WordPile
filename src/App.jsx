@@ -1,10 +1,10 @@
-import React, { useEffect } from "react";
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
-import GameBoard from "./components/GameBoard";
-import ScoreDisplay from "./components/ScoreDisplay";
-import { useGameState } from "./hooks/useGameState";
-import CustomDragLayer from "./components/CustomDragLayer"; // New drag layer
+import React, { useEffect } from 'react';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+import GameBoard from './components/GameBoard';
+import ScoreDisplay from './components/ScoreDisplay';
+import { useGameState } from './hooks/useGameState';
+import CustomDragLayer from './components/CustomDragLayer'; // New drag layer
 
 function App() {
   const gridSize = 6; // Set your desired grid size here
@@ -24,9 +24,9 @@ function App() {
   useEffect(() => {
     // Load the dictionary on mount
     const loadDictionary = async () => {
-      const response = await fetch("/assets/enable.txt");
+      const response = await fetch('/assets/enable.txt');
       const text = await response.text();
-      const words = text.split("\n").map((word) => word.trim().toUpperCase());
+      const words = text.split('\n').map((word) => word.trim().toUpperCase());
       setDictionary(words);
     };
 

@@ -1,21 +1,21 @@
-import React, { useRef } from "react";
-import { useDrag } from "react-dnd";
-import { useDragOverlay } from "../hooks/useDragOverlay";
-import { useGameState } from "../hooks/useGameState";
+import React, { useRef } from 'react';
+import { useDrag } from 'react-dnd';
+import { useDragOverlay } from '../hooks/useDragOverlay';
+import { useGameState } from '../hooks/useGameState';
 
 const LetterTile = ({ position }) => {
   const ref = useRef(null);
   const { startDragging, stopDragging } = useDragOverlay();
 
   const [{ isDragging }, drag] = useDrag(() => ({
-    type: "tile",
+    type: 'tile',
     item: () => {
       // Dynamically fetch the latest grid state
       const { letterGrid } = useGameState.getState();
       const currentLetter = letterGrid[position[0]][position[1]];
 
       // Log the correct letter and start dragging
-    //   console.log(`Drag started for letter: ${currentLetter}, position: ${position}`);
+      //   console.log(`Drag started for letter: ${currentLetter}, position: ${position}`);
       startDragging(currentLetter);
 
       return { letter: currentLetter, position };
@@ -40,10 +40,10 @@ const LetterTile = ({ position }) => {
       ref={ref}
       className={`tile p-4 m-1 ${
         currentLetter === useGameState.getState().getLeastUsedLetter()
-          ? "bg-red-500"
-          : "bg-blue-500"
+          ? 'bg-red-500'
+          : 'bg-blue-500'
       } text-white font-bold rounded-md shadow-md cursor-pointer ${
-        isDragging ? "opacity-50" : ""
+        isDragging ? 'opacity-50' : ''
       }`}
     >
       {currentLetter}
@@ -52,8 +52,6 @@ const LetterTile = ({ position }) => {
 };
 
 export default LetterTile;
-
-
 
 // import React, { useRef } from "react";
 // import { useDrag } from "react-dnd";
@@ -104,9 +102,6 @@ export default LetterTile;
 // };
 
 // export default LetterTile;
-
-
-
 
 // import React, { useRef } from "react";
 // import { useDrag } from "react-dnd";

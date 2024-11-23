@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState } from 'react';
 
 export const useDragOverlay = () => {
   const [isDragging, setIsDragging] = useState(false);
@@ -11,23 +11,29 @@ export const useDragOverlay = () => {
     setDragX(x);
     setDragY(y);
   };
-  
+
   const startDragging = (letter) => {
     // console.log(`Start dragging: ${letter}`); // Log drag start
     setIsDragging(true);
     setDragLetter(letter);
   };
-  
+
   const stopDragging = () => {
     // console.log("Stop dragging"); // Log drag end
     setIsDragging(false);
     setDragLetter(null);
-  };  
+  };
 
-  return { isDragging, dragLetter, dragX, dragY, startDragging, stopDragging, updatePosition };
+  return {
+    isDragging,
+    dragLetter,
+    dragX,
+    dragY,
+    startDragging,
+    stopDragging,
+    updatePosition,
+  };
 };
-
-
 
 // import { create } from "zustand";
 

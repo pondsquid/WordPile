@@ -1,0 +1,10 @@
+Use the Cleanup Branch
+  Optional: Use Branches for Cleanup and Features
+  To keep your main branch clean:
+    Create a branch for cleanup:
+    git checkout -b cleanup
+  Commit all your cleanup fixes there.
+  Merge back into main once stable:
+    git checkout main
+    git merge cleanup
+

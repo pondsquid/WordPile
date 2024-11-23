@@ -27,8 +27,10 @@ yarn-error.log*
 *.lock
 
 # Editor files
-.vscode/
 .idea/
+# Ignore the .vscode folder, except settings.json
+.vscode/*
+!.vscode/settings.json
 
 # System files
 .DS_Store
