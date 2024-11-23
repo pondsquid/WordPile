@@ -25,6 +25,9 @@ Use the Cleanup Branch
   Merge back into main once stable:
     git checkout main
     git merge cleanup
+  Maybe also push the merged branch back up
+    git push origin main
+
 
 Git Stuff:
   git push -u origin cleanup
