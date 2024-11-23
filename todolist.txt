@@ -1,3 +1,21 @@
+Using a tough letter upletter counts - counts as an extra letter
+Show which tiles are part of words - borders on the tiles?
+Remove Calc Score - make it "list words" - put all words/scores under board
+Border on the tiles!
+Does it work on mobile/other browsers?
+
+
+Check the date and have a "date->puzzle" word/seed generation
+Seed -- print it and a way to set/enter it?
+Leaderboard -- pointsx10-turns? something? and backend
+Publish -- how do you say "this is my score" or do we track best or...?
+Dailies -- a way to set a word+seed for a day? or we make one up each day? 
+"Main word" - a <width> letter word that uses the tricky letter?
+
+
+
+GITHUB Notes:
+
 Use the Cleanup Branch
   Optional: Use Branches for Cleanup and Features
   To keep your main branch clean:
