@@ -1,4 +1,6 @@
-Using a tough letter upletter counts - counts as an extra letter
+Bug - no score as we generate the grid, have to move one thing
+Big Bug - "subwords" count to score... hmmmmm
+
 Show which tiles are part of words - borders on the tiles?
 Remove Calc Score - make it "list words" - put all words/scores under board
 Border on the tiles!

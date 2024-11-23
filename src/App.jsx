@@ -10,17 +10,6 @@ function App() {
   const gridSize = 6; // Set your desired grid size here
   const { setDictionary } = useGameState();
 
-  // useEffect(() => {
-  //   // Load the dictionary file
-  //   fetch("/assets/enable.txt")
-  //     .then((res) => res.text())
-  //     .then((data) => {
-  //       const words = data.split("\n").map((word) => word.trim().toUpperCase());
-  //       setDictionary(words);
-  //     })
-  //     .catch((err) => console.error("Failed to load dictionary:", err));
-  // }, [setDictionary]);
-
   useEffect(() => {
     // Load the dictionary on mount
     const loadDictionary = async () => {

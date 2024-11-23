@@ -7,8 +7,7 @@ const ScoreDisplay = () => {
   return (
     <div className="flex items-center space-x-4">
       <div className="text-xl font-bold">Score: {score}</div>
-      <div className="text-xl font-bold">Words: {wordCount}</div>{' '}
-      {/* Add word count */}
+      <div className="text-xl font-bold">Words: {wordCount}</div>
       <div className="text-xl font-bold">Turn: {turn}</div>
     </div>
   );
