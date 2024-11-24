@@ -12,6 +12,10 @@ export const useGameState = create((set, get) => ({
   wordCount: 0,
   letterGrid: [],
   dictionary: new Set(),
+  seed: null, // Store the current seed
+
+  // Update the seed manually
+  setSeed: (newSeed) => set({ seed: newSeed }),
 
   // Update the score directly
   updateScore: (points) => set((state) => ({ score: state.score + points })),
@@ -31,10 +35,24 @@ export const useGameState = create((set, get) => ({
     return findLeastUsedLetterOnGrid(grid);
   },
 
-  // Populate the grid with random letters
-  populateGrid: (gridSize) => {
-    const grid = populateGrid(gridSize);
-    set({ letterGrid: grid });
+  // Populate the grid based on a seed
+  populateGrid: (gridSize, seed) => {
+    const actualSeed = seed || Math.random().toString(36).substr(2, 9); // Generate a random seed if none provided
+    const grid = populateGrid(gridSize, actualSeed); // Pass seed to the utility function
+    const leastUsedLetter = findLeastUsedLetterOnGrid(grid);
+    const { score, wordCount } = calculateScore(
+      grid,
+      get().dictionary,
+      leastUsedLetter,
+      MIN_WORD_LENGTH
+    );
+
+    set({
+      letterGrid: grid,
+      seed: actualSeed, // Save the seed for reproducibility
+      score,
+      wordCount,
+    });
   },
 
   // Move a letter from one position to another
