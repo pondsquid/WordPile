@@ -28,12 +28,12 @@ export const letterFrequencies = [
 ];
 
 // Generate a random letter based on frequencies
-export const generateWeightedLetter = () => {
+export const generateWeightedLetter = (random) => {
   const totalWeight = letterFrequencies.reduce(
     (sum, entry) => sum + entry.weight,
     0
   );
-  const randomWeight = Math.random() * totalWeight;
+  const randomWeight = random() * totalWeight;
 
   let cumulativeWeight = 0;
   for (const { letter, weight } of letterFrequencies) {

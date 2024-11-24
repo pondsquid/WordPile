@@ -20,6 +20,6 @@ export const populateGrid = (gridSize, seed) => {
     .map(() =>
       Array(gridSize)
         .fill(null)
-        .map(() => (random() < 0.6 ? generateWeightedLetter() : null))
+        .map(() => (random() < 0.6 ? generateWeightedLetter(random) : null))
     );
 };
