@@ -11,16 +11,15 @@ const CustomDragLayer = () => {
   }));
 
   // Watch the grid for changes and recompute tile dimensions
-  const { letterGrid } = useGameState();
+  const { letterGrid, getLeastUsedLetter } = useGameState();
 
   useEffect(() => {
     const tile = document.querySelector('.tile');
     if (tile) {
       const { width, height } = tile.getBoundingClientRect();
-      //      console.log(`Detected tile dimensions: width=${width}, height=${height}`);
       setTileDimensions({ width, height });
     } else {
-      //      console.warn("No tile found for dimension detection.");
+      console.warn('No tile found for dimension detection.');
     }
   }, [letterGrid]); // Recompute whenever the grid changes
 
@@ -29,6 +28,10 @@ const CustomDragLayer = () => {
   }
 
   const { x, y } = currentOffset;
+
+  // Check if the current tile is the least-used letter
+  const leastUsedLetter = getLeastUsedLetter();
+  const isLeastUsed = item?.letter === leastUsedLetter;
 
   return (
     <div
@@ -45,7 +48,7 @@ const CustomDragLayer = () => {
         style={{
           width: `${tileDimensions.width}px`,
           height: `${tileDimensions.height}px`,
-          backgroundColor: 'blue',
+          backgroundColor: isLeastUsed ? 'red' : 'blue',
           color: 'white',
           fontSize: '24px',
           display: 'flex',

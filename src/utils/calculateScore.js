@@ -11,8 +11,11 @@ export const calculateScore = (
     [1, -1], // Diagonal down-left
   ];
 
-  const isWordValid = (word) =>
-    word.length >= minWordLength && dictionary.has(word);
+  const isWordValid = (word, prevChar, nextChar) =>
+    word.length >= minWordLength &&
+    dictionary.has(word) &&
+    (!prevChar || prevChar === null) && // Ensure the word starts at a blank or edge
+    (!nextChar || nextChar === null); // Ensure the word ends at a blank or edge
 
   let totalScore = 0;
   let wordCount = 0;
@@ -25,12 +28,20 @@ export const calculateScore = (
     return fibonacci(scorelen); // Fibonacci scoring
   };
 
-  // Function to process a single starting position
   const processPosition = (x, y) => {
     directions.forEach(([dx, dy]) => {
       let word = '';
       let nx = x;
       let ny = y;
+
+      // Get the character before the starting position
+      const prevChar =
+        x - dx >= 0 &&
+        y - dy >= 0 &&
+        x - dx < grid.length &&
+        y - dy < grid[x - dx].length
+          ? grid[x - dx][y - dy]
+          : null;
 
       while (
         nx >= 0 &&
@@ -43,7 +54,13 @@ export const calculateScore = (
         nx += dx;
         ny += dy;
 
-        if (isWordValid(word)) {
+        // Get the character after the current word
+        const nextChar =
+          nx >= 0 && ny >= 0 && nx < grid.length && ny < grid[nx].length
+            ? grid[nx][ny]
+            : null;
+
+        if (isWordValid(word, prevChar, nextChar)) {
           totalScore += calculateWordScore(word); // Add word score
           wordCount++;
           console.log('Scoring', word, 'total now', totalScore);
@@ -52,7 +69,6 @@ export const calculateScore = (
     });
   };
 
-  // Process every position in the grid
   for (let x = 0; x < grid.length; x++) {
     for (let y = 0; y < grid[x].length; y++) {
       processPosition(x, y);

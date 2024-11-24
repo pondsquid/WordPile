@@ -1,5 +1,6 @@
-Bug - no score as we generate the grid, have to move one thing
 Big Bug - "subwords" count to score... hmmmmm
+We need to take whole words, not with extra characters after!
+Also, red tile, when drag and drop, is blue again...
 
 Show which tiles are part of words - borders on the tiles?
 Remove Calc Score - make it "list words" - put all words/scores under board
@@ -14,6 +15,17 @@ Publish -- how do you say "this is my score" or do we track best or...?
 Dailies -- a way to set a word+seed for a day? or we make one up each day? 
 "Main word" - a <width> letter word that uses the tricky letter?
 
+
+======
+step 1 is generating a more interesting board, without breaking the rest of the game
+so we want to add
+a) make sure there is one word that is possible to make that is the full size of the grid
+b) do adaptive letter probability - where we see what we have already put on the grid
+c) have the board density be 40-60 percent of the squares
+d) use a random seed, so we can regenerate a given board (in preparation for daily puzzles)
+
+and later we will change the setup phase to pick from the daily, a random, or a seed you enter
+======
 
 
 GITHUB Notes:
