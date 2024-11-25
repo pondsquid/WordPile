@@ -1,109 +1,129 @@
 import { create } from 'zustand';
-import { populateGrid } from '../utils/populateGrid';
+import { populateGrid as generateGrid } from '../utils/populateGrid';
 import { calculateScore } from '../utils/calculateScore';
+import { generateRandomSeed } from '../utils/seedUtils';
 import { findLeastUsedLetterOnGrid } from '../utils/letterFrequencies';
 
 const MIN_WORD_LENGTH = 3;
 
 export const useGameState = create((set, get) => ({
-  // State variables
-  score: 0,
-  turn: 1,
-  wordCount: 0,
-  letterGrid: [],
-  dictionary: new Set(),
-  seed: null, // Store the current seed
-  date: null, // Associated date, if any
-  scoringPositions: [], // Tracks scoring letter positions
-  wordList: [], // Tracks words and their scores
+  gridSize: 6, // Default grid size
+  seed: null, // Current seed
+  letterGrid: [], // Current board grid
+  dictionary: new Set(), // Word dictionary
+  score: 0, // Total score
+  wordCount: 0, // Total words
+  scoringPositions: [], // Positions contributing to current score
+  wordList: [], // Words contributing to the score
+  turn: 1, // Turn counter
+  initialized: false, // Initialization flag
 
-  setSeed: (seed, date = null) => set(() => ({ seed, date })), // Update seed and date
-
-  // Increment the turn count
-  nextTurn: () => set((state) => ({ turn: state.turn + 1 })),
-
-  // Set the letter grid manually
-  setLetterGrid: (grid) => set(() => ({ letterGrid: grid })),
-
-  // Set the dictionary from a word list
-  setDictionary: (words) => set(() => ({ dictionary: new Set(words) })),
-
-  // Dynamically find the least-used letter on the grid
+  // Get the least-used letter for scoring bonuses
   getLeastUsedLetter: () => {
-    const grid = get().letterGrid;
-    return findLeastUsedLetterOnGrid(grid);
+    const letterGrid = get().letterGrid; // Access current grid
+    return findLeastUsedLetterOnGrid(letterGrid); // Use utility to compute
   },
 
-  // Populate the grid based on a seed
+  // Update the grid size dynamically
+  setGridSize: (newSize) => {
+    set({ gridSize: newSize });
+    get().populateGrid(newSize, get().seed);
+  },
+
+  // Update the current seed
+  setSeed: (newSeed) => set({ seed: newSeed }),
+
+  // Set the letter grid directly
+  setLetterGrid: (grid) => set({ letterGrid: grid }),
+
+  // Populate the grid with the specified or default size and seed
   populateGrid: (gridSize, seed) => {
-    const actualSeed = seed || Math.random().toString(36).substr(2, 9); // Generate a random seed if none provided
-    const grid = populateGrid(gridSize, actualSeed); // Pass seed to the utility function
-    const leastUsedLetter = findLeastUsedLetterOnGrid(grid);
+    const actualSeed = seed || generateRandomSeed();
+    const dictionary = get().dictionary;
+    const newGrid = generateGrid(gridSize, actualSeed, dictionary);
+    const leastUsedLetter = findLeastUsedLetterOnGrid(newGrid);
+
+    // Recalculate score and word list
     const { score, wordCount, scoringPositions, wordList } = calculateScore(
-      grid,
-      get().dictionary,
+      newGrid,
+      dictionary,
       leastUsedLetter,
       MIN_WORD_LENGTH
     );
 
+    // Update state with new grid and score
     set({
-      letterGrid: grid,
-      seed: actualSeed, // Save the seed for reproducibility
+      gridSize,
+      seed: actualSeed,
+      letterGrid: newGrid,
       score,
       wordCount,
       scoringPositions,
       wordList,
+      turn: 1, // Reset turn count
     });
   },
 
-  // Move a letter from one position to another
+  // Reset the grid to its initial state
+  resetGrid: () => {
+    const { gridSize, seed } = get();
+    get().populateGrid(gridSize, seed);
+  },
+
+  // Increment the turn counter
+  nextTurn: () => set((state) => ({ turn: state.turn + 1 })),
+
+  // Set the word dictionary
+  setDictionary: (words) => set({ dictionary: new Set(words) }),
+
+  // Move a letter on the grid and recalculate score
   moveLetter: (fromPosition, toPosition) => {
     set((state) => {
-      const grid = state.letterGrid.map((row) => [...row]); // Deep copy of grid
+      const newGrid = state.letterGrid.map((row) => [...row]); // Deep copy the grid
       const [fromRow, fromCol] = fromPosition;
       const [toRow, toCol] = toPosition;
 
-      // Ensure valid positions
-      if (!grid[fromRow] || !grid[toRow]) return state;
-      if (!grid[fromRow][fromCol]) return state;
+      // Validate positions
+      if (!newGrid[fromRow] || !newGrid[toRow]) return state;
+      if (!newGrid[fromRow][fromCol]) return state;
       if (fromRow === toRow && fromCol === toCol) return state;
 
-      // Perform the swap/move
-      const draggedLetter = grid[fromRow][fromCol];
-      const targetLetter = grid[toRow][toCol];
-      grid[toRow][toCol] = draggedLetter;
-      grid[fromRow][fromCol] = targetLetter;
+      // Swap letters
+      const draggedLetter = newGrid[fromRow][fromCol];
+      const targetLetter = newGrid[toRow][toCol];
+      newGrid[toRow][toCol] = draggedLetter;
+      newGrid[fromRow][fromCol] = targetLetter;
 
-      // Get the least-used letter
-      const leastUsedLetter = get().getLeastUsedLetter();
-
-      // Calculate score and word count with updated grid
+      // Recalculate score
+      const leastUsedLetter = findLeastUsedLetterOnGrid(newGrid);
       const { score, wordCount, scoringPositions, wordList } = calculateScore(
-        grid,
+        newGrid,
         state.dictionary,
         leastUsedLetter,
         MIN_WORD_LENGTH
       );
 
+      // Update state
       return {
-        ...state, // Preserve other state properties
-        letterGrid: grid, // Update grid
-        score, // Update score
-        wordCount, // Update word count
-        scoringPositions, // Update scoring positions
-        wordList, // Update word list
-        turn: state.turn + 1, // Increment turn
+        ...state,
+        letterGrid: newGrid,
+        score,
+        wordCount,
+        scoringPositions,
+        wordList,
+        turn: state.turn + 1, // Increment turn count
       };
     });
   },
 
-  // Trigger score calculation manually
+  // Calculate score manually
   calculateScore: () => {
     const grid = get().letterGrid;
+    const dictionary = get().dictionary;
     const leastUsedLetter = get().getLeastUsedLetter();
     const { score, wordCount, scoringPositions, wordList } = calculateScore(
       grid,
-      get().dictionary,
+      dictionary,
       leastUsedLetter,
       MIN_WORD_LENGTH
     );

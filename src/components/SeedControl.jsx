@@ -1,118 +1,99 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { useGameState } from '../hooks/useGameState';
 import {
-  generateRandomSeed,
   generateSeedFromDate,
+  generateRandomSeed,
   isValidHexSeed,
 } from '../utils/seedUtils';
 
-const SeedControl = ({ gridSize }) => {
-  const { seed, date, populateGrid, setSeed } = useGameState();
+const SeedControl = () => {
+  const { setSeed, populateGrid, resetGrid, gridSize, seed } = useGameState();
   const [isEnteringSeed, setIsEnteringSeed] = useState(false);
   const [inputSeed, setInputSeed] = useState('');
   const inputRef = useRef(null);
 
-  const handleReset = () => {
-    populateGrid(gridSize, seed);
-  };
-
-  const handleDaily = () => {
-    const { seed: dailySeed, date: dailyDate } = generateSeedFromDate(
-      new Date()
-    );
-    setSeed(dailySeed, dailyDate);
-    populateGrid(gridSize, dailySeed);
-  };
-
-  const handleRandom = () => {
+  const handleRandomSeed = () => {
     const randomSeed = generateRandomSeed();
     setSeed(randomSeed);
     populateGrid(gridSize, randomSeed);
   };
 
-  const handleConfirmSeed = () => {
-    const newSeed = inputSeed.trim();
-
-    if (/^\d{4}-\d{2}-\d{2}$/.test(newSeed)) {
-      // Handle date-formatted seeds
-      const { seed: customSeed, date: customDate } =
-        generateSeedFromDate(newSeed);
-      setSeed(customSeed, customDate);
-      populateGrid(gridSize, customSeed);
-    } else if (isValidHexSeed(newSeed)) {
-      // Handle valid hex seed
-      setSeed(newSeed);
-      populateGrid(gridSize, newSeed);
-    }
-
-    // Invalid seeds are silently ignored (no popup or error handling)
-    setIsEnteringSeed(false);
-    setInputSeed(''); // Clear the input
+  const handleDailySeed = () => {
+    const todaySeed = generateSeedFromDate(new Date());
+    setSeed(todaySeed);
+    populateGrid(gridSize, todaySeed);
   };
 
-  const handleCancel = () => {
-    setIsEnteringSeed(false);
-    setInputSeed('');
+  const handleConfirmSeed = () => {
+    const trimmedSeed = inputSeed.trim();
+    if (isValidHexSeed(trimmedSeed)) {
+      setSeed(trimmedSeed);
+      populateGrid(gridSize, trimmedSeed);
+    } else {
+      const date = new Date(trimmedSeed); // Parse as date
+      if (!isNaN(date.getTime())) {
+        // Valid date check
+        const dateSeed = generateSeedFromDate(date);
+        setSeed(dateSeed);
+        populateGrid(gridSize, dateSeed);
+      }
+    }
+    setIsEnteringSeed(false); // Gracefully dismiss
   };
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
       handleConfirmSeed();
     } else if (e.key === 'Escape') {
-      handleCancel();
+      setIsEnteringSeed(false);
     }
   };
 
-  useEffect(() => {
-    if (isEnteringSeed && inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, [isEnteringSeed]);
+  const handleEnterSeed = () => {
+    setIsEnteringSeed(true);
+    setTimeout(() => {
+      inputRef.current?.focus(); // Autofocus restored
+    }, 0);
+  };
 
   return (
-    <div className="seed-control flex flex-col items-center gap-2">
-      <div className="flex gap-2">
+    <div className="seed-control mt-4 flex flex-col items-center">
+      <div className="flex gap-2 mb-2">
         <button
-          onClick={handleReset}
-          className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-700"
+          onClick={resetGrid}
+          className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-700"
         >
           Reset
         </button>
         <button
-          onClick={handleDaily}
-          className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-700"
+          onClick={handleDailySeed}
+          className="px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-700"
         >
           Daily
         </button>
         <button
-          onClick={handleRandom}
-          className="px-4 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-700"
+          onClick={handleRandomSeed}
+          className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-700"
         >
           Random
         </button>
         <button
-          onClick={() => setIsEnteringSeed(true)}
-          className="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-700"
+          onClick={handleEnterSeed}
+          className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-700"
         >
           Enter Seed
         </button>
       </div>
-      {!isEnteringSeed ? (
-        <p className="text-sm mt-1">
-          Current Seed: {seed || 'None'}
-          {date && ` (Daily: ${date})`}
-        </p>
-      ) : (
-        <div className="flex gap-2 mt-1">
+      {isEnteringSeed ? (
+        <div className="mt-2 flex gap-2">
           <input
+            ref={inputRef} // Autofocus restored
             type="text"
-            ref={inputRef}
-            placeholder="Enter seed (hex or YYYY-MM-DD)"
             value={inputSeed}
             onChange={(e) => setInputSeed(e.target.value)}
             onKeyDown={handleKeyDown}
             className="px-4 py-2 border rounded-md"
-            autoComplete="off"
+            placeholder="Enter hex seed or date"
           />
           <button
             onClick={handleConfirmSeed}
@@ -121,12 +102,17 @@ const SeedControl = ({ gridSize }) => {
             Confirm
           </button>
           <button
-            onClick={handleCancel}
+            onClick={() => setIsEnteringSeed(false)}
             className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-700"
           >
             Cancel
           </button>
         </div>
+      ) : (
+        <p className="text-sm mt-2">
+          Current Seed: {typeof seed === 'string' ? seed : seed?.seed || 'None'}{' '}
+          {seed?.date && `[Daily ${seed.date}]`}
+        </p>
       )}
     </div>
   );
