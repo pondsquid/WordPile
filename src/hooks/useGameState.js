@@ -13,9 +13,9 @@ export const useGameState = create((set, get) => ({
   letterGrid: [],
   dictionary: new Set(),
   seed: null, // Store the current seed
+  date: null, // Associated date, if any
 
-  // Update the seed manually
-  setSeed: (newSeed) => set({ seed: newSeed }),
+  setSeed: (seed, date = null) => set(() => ({ seed, date })), // Update seed and date
 
   // Update the score directly
   updateScore: (points) => set((state) => ({ score: state.score + points })),

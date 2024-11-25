@@ -1,44 +1,84 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useGameState } from '../hooks/useGameState';
 
 const SeedControl = ({ gridSize }) => {
-  const { seed, populateGrid, setSeed } = useGameState();
+  const { seed, date, populateGrid, setSeed } = useGameState(); // Fetch date from game state
+  const [isEnteringSeed, setIsEnteringSeed] = useState(false); // Toggle input mode
+  const [inputSeed, setInputSeed] = useState(''); // Store the seed being entered
+  const inputRef = useRef(null); // For auto-focusing the input field
 
-  // Generate a seed based on the current date (e.g., "2024-11-24")
-  const generateDailySeed = () => {
-    const today = new Date().toISOString().slice(0, 10);
-    return today;
+  // Generate a daily seed
+  const generateDailySeed = (dateString) => {
+    const date = dateString ? new Date(dateString) : new Date();
+    const isoDate = date.toISOString().slice(0, 10); // e.g., "2024-11-24"
+    const hashSeed = Array.from(isoDate)
+      .reduce((hash, char) => (hash * 31 + char.charCodeAt(0)) >>> 0, 0)
+      .toString(16);
+    return { seed: hashSeed, date: isoDate };
   };
 
-  // Handle board reset using the current seed
+  // Reset the board using the current seed
   const handleReset = () => {
-    populateGrid(gridSize, seed); // Reuse the current seed to regenerate the board
+    populateGrid(gridSize, seed);
   };
 
-  // Handle Daily/Enter Seed logic
-  const handleDailyOrEnterSeed = () => {
-    const userSeed = prompt('Enter a seed value (leave blank for random):', '');
+  // Generate the daily board
+  const handleDaily = () => {
+    const { seed: dailySeed, date: dailyDate } = generateDailySeed();
+    setSeed(dailySeed, dailyDate); // Store both seed and date
+    populateGrid(gridSize, dailySeed); // Use the seed for the grid
+  };
 
-    if (userSeed === null) {
-      // User canceled the prompt, do nothing
-      return;
+  // Generate a new random seed and reset the board
+  const handleRandom = () => {
+    const randomSeed = Math.random().toString(36).substr(2, 9);
+    setSeed(randomSeed); // Store seed without a date
+    populateGrid(gridSize, randomSeed);
+  };
+
+  // Confirm a custom seed
+  const handleConfirmSeed = () => {
+    const newSeed = inputSeed.trim();
+
+    // Check if the input is a date in YYYY-MM-DD format
+    if (/^\d{4}-\d{2}-\d{2}$/.test(newSeed)) {
+      const { seed: customSeed, date: customDate } = generateDailySeed(newSeed);
+      setSeed(customSeed, customDate); // Store both seed and date
+      populateGrid(gridSize, customSeed); // Use the computed seed
+    } else {
+      const finalSeed = newSeed || Math.random().toString(36).substr(2, 9);
+      setSeed(finalSeed); // Store seed without a date
+      populateGrid(gridSize, finalSeed);
     }
 
-    const newSeed = userSeed.trim() || Math.random().toString(36).substr(2, 9); // Generate random seed if blank
-    setSeed(newSeed);
-    populateGrid(gridSize, newSeed);
+    setIsEnteringSeed(false); // Exit input mode
+    setInputSeed(''); // Clear the input
   };
 
-  // Handle the Daily seed generation
-  const handleDaily = () => {
-    const dailySeed = generateDailySeed();
-    setSeed(dailySeed);
-    populateGrid(gridSize, dailySeed);
+  // Cancel seed entry
+  const handleCancel = () => {
+    setIsEnteringSeed(false); // Exit input mode
+    setInputSeed(''); // Clear the input
   };
+
+  // Handle keyboard shortcuts (Enter, Esc)
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      handleConfirmSeed(); // Trigger confirm logic
+    } else if (e.key === 'Escape') {
+      handleCancel(); // Trigger cancel logic
+    }
+  };
+
+  // Auto-focus the input box when entering seed mode
+  useEffect(() => {
+    if (isEnteringSeed && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isEnteringSeed]);
 
   return (
     <div className="seed-control flex flex-col items-center gap-2">
-      <p className="text-sm">Current Seed: {seed || 'None'}</p>
       <div className="flex gap-2">
         <button
           onClick={handleReset}
@@ -53,12 +93,52 @@ const SeedControl = ({ gridSize }) => {
           Daily
         </button>
         <button
-          onClick={handleDailyOrEnterSeed}
+          onClick={handleRandom}
           className="px-4 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-700"
+        >
+          Random
+        </button>
+        <button
+          onClick={() => setIsEnteringSeed(true)}
+          className="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-700"
         >
           Enter Seed
         </button>
       </div>
+
+      {/* Toggle between Current Seed display and Enter Seed input */}
+      {!isEnteringSeed ? (
+        <p className="text-sm mt-1">
+          Current Seed: {seed || 'None'}
+          {date && ` (Daily: ${date})`} {/* Append date if it's linked */}
+        </p>
+      ) : (
+        <div className="flex gap-2 mt-1">
+          <input
+            type="text"
+            ref={inputRef} // Attach ref for auto-focus
+            placeholder="Enter seed"
+            value={inputSeed}
+            onChange={(e) => setInputSeed(e.target.value)}
+            onKeyDown={handleKeyDown} // Handle Enter and Esc
+            className="px-4 py-2 border rounded-md"
+            autoComplete="off"
+            writingsuggestions="false"
+          />
+          <button
+            onClick={handleConfirmSeed}
+            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-700"
+          >
+            Confirm
+          </button>
+          <button
+            onClick={handleCancel}
+            className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-700"
+          >
+            Cancel
+          </button>
+        </div>
+      )}
     </div>
   );
 };

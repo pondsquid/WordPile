@@ -16,6 +16,7 @@ const GameBoard = ({ gridSize = 6 }) => {
         className="grid gap-2 p-4 bg-gray-200 rounded-md"
         style={{
           gridTemplateColumns: `repeat(${gridSize}, 1fr)`, // Adjust columns dynamically
+          marginBottom: '4px', // Add spacing below the grid
         }}
       >
         {letterGrid.map((row, rowIndex) =>
@@ -28,12 +29,6 @@ const GameBoard = ({ gridSize = 6 }) => {
           ))
         )}
       </div>
-      <button
-        onClick={() => populateGrid(gridSize)}
-        className="mt-4 px-4 py-2 bg-blue-500 text-white font-bold rounded-md hover:bg-blue-700"
-      >
-        Populate Grid
-      </button>
     </div>
   );
 };
