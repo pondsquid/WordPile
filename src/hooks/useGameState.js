@@ -14,11 +14,10 @@ export const useGameState = create((set, get) => ({
   dictionary: new Set(),
   seed: null, // Store the current seed
   date: null, // Associated date, if any
+  scoringPositions: [], // Tracks scoring letter positions
+  wordList: [], // Tracks words and their scores
 
   setSeed: (seed, date = null) => set(() => ({ seed, date })), // Update seed and date
-
-  // Update the score directly
-  updateScore: (points) => set((state) => ({ score: state.score + points })),
 
   // Increment the turn count
   nextTurn: () => set((state) => ({ turn: state.turn + 1 })),
@@ -40,7 +39,7 @@ export const useGameState = create((set, get) => ({
     const actualSeed = seed || Math.random().toString(36).substr(2, 9); // Generate a random seed if none provided
     const grid = populateGrid(gridSize, actualSeed); // Pass seed to the utility function
     const leastUsedLetter = findLeastUsedLetterOnGrid(grid);
-    const { score, wordCount } = calculateScore(
+    const { score, wordCount, scoringPositions, wordList } = calculateScore(
       grid,
       get().dictionary,
       leastUsedLetter,
@@ -52,6 +51,8 @@ export const useGameState = create((set, get) => ({
       seed: actualSeed, // Save the seed for reproducibility
       score,
       wordCount,
+      scoringPositions,
+      wordList,
     });
   },
 
@@ -77,7 +78,7 @@ export const useGameState = create((set, get) => ({
       const leastUsedLetter = get().getLeastUsedLetter();
 
       // Calculate score and word count with updated grid
-      const { score, wordCount } = calculateScore(
+      const { score, wordCount, scoringPositions, wordList } = calculateScore(
         grid,
         state.dictionary,
         leastUsedLetter,
@@ -89,6 +90,8 @@ export const useGameState = create((set, get) => ({
         letterGrid: grid, // Update grid
         score, // Update score
         wordCount, // Update word count
+        scoringPositions, // Update scoring positions
+        wordList, // Update word list
         turn: state.turn + 1, // Increment turn
       };
     });
@@ -98,12 +101,12 @@ export const useGameState = create((set, get) => ({
   calculateScore: () => {
     const grid = get().letterGrid;
     const leastUsedLetter = get().getLeastUsedLetter();
-    const scoreData = calculateScore(
+    const { score, wordCount, scoringPositions, wordList } = calculateScore(
       grid,
       get().dictionary,
       leastUsedLetter,
       MIN_WORD_LENGTH
     );
-    set({ score: scoreData.score, wordCount: scoreData.wordCount });
+    set({ score, wordCount, scoringPositions, wordList });
   },
 }));
