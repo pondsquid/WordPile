@@ -1,14 +1,10 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useDrop } from 'react-dnd';
 import LetterTile from './LetterTile';
 import { useGameState } from '../hooks/useGameState';
 
 const GameBoard = ({ gridSize = 6 }) => {
-  const { letterGrid, populateGrid } = useGameState();
-
-  useEffect(() => {
-    populateGrid(gridSize); // Populate the grid on mount
-  }, [gridSize, populateGrid]);
+  const { letterGrid } = useGameState();
 
   return (
     <div className="flex flex-col items-center">
@@ -33,7 +29,7 @@ const GameBoard = ({ gridSize = 6 }) => {
   );
 };
 
-const GridSquare = ({ position }) => {
+const GridSquare = ({ position, letter }) => {
   const { moveLetter, letterGrid } = useGameState(); // Access state and actions
   const [row, col] = position;
 
@@ -41,21 +37,19 @@ const GridSquare = ({ position }) => {
     () => ({
       accept: 'tile',
       drop: (item) => {
-        moveLetter(item.position, position); // Handle both moves and swaps
+        moveLetter(item.position, position); // Handle moves and swaps
       },
       canDrop: () => true, // Always allow drops
     }),
-    [letterGrid]
-  ); // Dependency ensures latest state
+    [letterGrid] // Dependency ensures latest state
+  );
 
   return (
     <div
       ref={drop}
       className="w-16 h-16 border-2 border-gray-400 flex items-center justify-center bg-white"
     >
-      {letterGrid[row][col] && (
-        <LetterTile letter={letterGrid[row][col]} position={[row, col]} />
-      )}
+      {letter && <LetterTile letter={letter} position={position} />}
     </div>
   );
 };

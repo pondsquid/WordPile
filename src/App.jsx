@@ -1,35 +1,38 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import GameBoard from './components/GameBoard';
 import ScoreDisplay from './components/ScoreDisplay';
-import SeedControl from './components/SeedControl'; // Updated Seed Control
+import SeedControl from './components/SeedControl';
 import { useGameState } from './hooks/useGameState';
-import CustomDragLayer from './components/CustomDragLayer'; // Drag Layer
+import CustomDragLayer from './components/CustomDragLayer';
+import { generateRandomSeed } from './utils/seedUtils';
 
 function App() {
-  const gridSize = 7; // Set your desired grid size here
-  const { setDictionary, populateGrid } = useGameState(); // Add populateGrid here
+  const gridSize = 6;
+  const { setDictionary, populateGrid } = useGameState();
+  const isInitialized = useRef(false);
 
   useEffect(() => {
-    // Load the dictionary on mount
     const loadDictionary = async () => {
       const response = await fetch('/assets/enable.txt');
       const text = await response.text();
       const words = text.split('\n').map((word) => word.trim().toUpperCase());
       setDictionary(words);
 
-      // Initialize the board once the dictionary is set
-      const randomSeed = Math.random().toString(36).substr(2, 9); // Generate a random seed
-      populateGrid(gridSize, randomSeed);
+      if (!isInitialized.current) {
+        const randomSeed = generateRandomSeed();
+        populateGrid(gridSize, randomSeed);
+        isInitialized.current = true;
+      }
     };
 
     loadDictionary();
-  }, [setDictionary, populateGrid]);
+  }, [setDictionary, populateGrid, gridSize]);
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <CustomDragLayer /> {/* Replaces DragOverlay */}
+      <CustomDragLayer />
       <div className="min-h-screen bg-gray-100 flex flex-col items-center">
         <h1 className="text-2xl font-bold my-4">Word Game</h1>
         <ScoreDisplay />
