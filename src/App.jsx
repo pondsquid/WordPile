@@ -6,7 +6,7 @@ import ScoreDisplay from './components/ScoreDisplay';
 import SeedControl from './components/SeedControl';
 import { useGameState } from './hooks/useGameState';
 import CustomDragLayer from './components/CustomDragLayer';
-import { generateRandomSeed } from './utils/seedUtils';
+import { generateSeedRandom } from './utils/seedUtils';
 
 function App() {
   const gridSize = 6;
@@ -21,7 +21,7 @@ function App() {
       setDictionary(words);
 
       if (!isInitialized.current) {
-        const randomSeed = generateRandomSeed();
+        const randomSeed = generateSeedRandom();
         populateGrid(gridSize, randomSeed);
         isInitialized.current = true;
       }

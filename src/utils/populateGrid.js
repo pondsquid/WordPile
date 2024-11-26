@@ -1,25 +1,26 @@
 import { generateWeightedLetter } from './letterFrequencies';
 
-// A simple PRNG based on a seed
-const seededRandom = (seed) => {
-  let x = 0;
-  for (let i = 0; i < seed.length; i++) {
-    x += seed.charCodeAt(i);
+const seededRandom = (seedInfo) => {
+  let t = parseInt(seedInfo.seed, 16);
+  if (isNaN(t)) {
+    throw new Error('Invalid hexadecimal seed');
   }
   return () => {
-    x = (x * 9301 + 49297) % 233280;
-    return x / 233280;
+    // Xorshift algorithm for random number generation
+    t ^= t << 13;
+    t ^= t >>> 17;
+    t ^= t << 5;
+    return (t >>> 0) / 4294967296; // Normalize to [0, 1)
   };
 };
 
-export const populateGrid = (gridSize, seed) => {
-  const random = seededRandom(seed); // Initialize PRNG with the seed
-
+export const populateGrid = (gridSize, seedInfo) => {
+  const random = seededRandom(seedInfo); // Initialize PRNG with the seed
   return Array(gridSize)
     .fill(null)
     .map(() =>
       Array(gridSize)
         .fill(null)
-        .map(() => (random() < 0.6 ? generateWeightedLetter(random) : null))
+        .map(() => (random() < 0.5 ? generateWeightedLetter(random) : null))
     );
 };

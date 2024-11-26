@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { populateGrid as generateGrid } from '../utils/populateGrid';
 import { calculateScore } from '../utils/calculateScore';
-import { generateRandomSeed } from '../utils/seedUtils';
+import { generateSeedRandom } from '../utils/seedUtils';
 import { findLeastUsedLetterOnGrid } from '../utils/letterFrequencies';
 
 const MIN_WORD_LENGTH = 3;
@@ -38,7 +38,7 @@ export const useGameState = create((set, get) => ({
 
   // Populate the grid with the specified or default size and seed
   populateGrid: (gridSize, seed) => {
-    const actualSeed = seed || generateRandomSeed();
+    const actualSeed = seed || generateSeedRandom();
     const dictionary = get().dictionary;
     const newGrid = generateGrid(gridSize, actualSeed, dictionary);
     const leastUsedLetter = findLeastUsedLetterOnGrid(newGrid);

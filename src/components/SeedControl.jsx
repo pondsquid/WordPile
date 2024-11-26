@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { useGameState } from '../hooks/useGameState';
 import {
   generateSeedFromDate,
-  generateRandomSeed,
+  generateSeedRandom,
   isValidHexSeed,
 } from '../utils/seedUtils';
 
@@ -13,7 +13,7 @@ const SeedControl = () => {
   const inputRef = useRef(null);
 
   const handleRandomSeed = () => {
-    const randomSeed = generateRandomSeed();
+    const randomSeed = generateSeedRandom();
     setSeed(randomSeed);
     populateGrid(gridSize, randomSeed);
   };
@@ -25,20 +25,46 @@ const SeedControl = () => {
   };
 
   const handleConfirmSeed = () => {
-    const trimmedSeed = inputSeed.trim();
-    if (isValidHexSeed(trimmedSeed)) {
-      setSeed(trimmedSeed);
-      populateGrid(gridSize, trimmedSeed);
-    } else {
-      const date = new Date(trimmedSeed); // Parse as date
-      if (!isNaN(date.getTime())) {
-        // Valid date check
-        const dateSeed = generateSeedFromDate(date);
-        setSeed(dateSeed);
-        populateGrid(gridSize, dateSeed);
-      }
+    const input = inputSeed.trim();
+
+    // Validate if input is a date
+    const parsedDate = new Date(input);
+    if (!isNaN(parsedDate.getTime())) {
+      const year = parsedDate.getFullYear();
+      const month = String(parsedDate.getMonth() + 1).padStart(2, '0'); // Ensure two-digit month
+      const day = String(parsedDate.getDate()).padStart(2, '0'); // Ensure two-digit day
+      const formattedDate = `${year}-${month}-${day}`;
+      const seedFromDate = generateSeedFromDate(new Date(formattedDate));
+      console.log(
+        'YMD is ',
+        year,
+        month,
+        day,
+        'so',
+        seedFromDate,
+        'from',
+        formattedDate
+      );
+      setSeed(seedFromDate);
+      populateGrid(gridSize, seedFromDate);
+      setInputSeed('');
+      setIsEnteringSeed(false);
+      return;
     }
-    setIsEnteringSeed(false); // Gracefully dismiss
+
+    // Validate if input is a hex seed
+    if (isValidHexSeed(input)) {
+      console.log('Apparently a safe hex seed', input);
+      setSeed(input);
+      populateGrid(gridSize, input);
+      setInputSeed('');
+      setIsEnteringSeed(false);
+      return;
+    }
+
+    // Ignore invalid input
+    setInputSeed('');
+    setIsEnteringSeed(false);
   };
 
   const handleKeyDown = (e) => {
@@ -88,6 +114,7 @@ const SeedControl = () => {
         <div className="mt-2 flex gap-2">
           <input
             ref={inputRef} // Autofocus restored
+            name="seed-input"
             type="text"
             value={inputSeed}
             onChange={(e) => setInputSeed(e.target.value)}

@@ -3,8 +3,10 @@
 // Validate if a seed is a valid hex string
 export const isValidHexSeed = (seed) => /^[0-9a-fA-F]+$/.test(seed);
 
-// Generate a random seed in base-36 format
-export const generateRandomSeed = () => Math.random().toString(36).slice(2, 11); // 9 characters, similar to substr
+// Generate a random seed in base-16 format
+export const generateSeedRandom = () => {
+  return { seed: Math.random().toString(16).slice(2, 11), date: null }; // 9 characters, similar to substr
+};
 
 // Generate a seed from a date (e.g., YYYY-MM-DD)
 export const generateSeedFromDate = (dateString) => {

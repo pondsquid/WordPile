@@ -1,12 +1,15 @@
-Big Bug - "subwords" count to score... hmmmmm
-We need to take whole words, not with extra characters after!
-Also, red tile, when drag and drop, is blue again...
+ok 
+  1. generateSeedFromDate is broken somehow, and we should use that in both places not inline in the other
+  2. then work on enter and keeping old value etc etc
+  3. then maybe on to word display etc- maybe we could reupload and have that work, who knows
+   
+
+
 
 Show which tiles are part of words - borders on the tiles?
 Remove Calc Score - make it "list words" - put all words/scores under board
 Border on the tiles!
 Does it work on mobile/other browsers?
-
 
 Check the date and have a "date->puzzle" word/seed generation
 Seed -- print it and a way to set/enter it?
