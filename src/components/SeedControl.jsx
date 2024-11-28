@@ -35,16 +35,6 @@ const SeedControl = () => {
       const day = String(parsedDate.getDate()).padStart(2, '0'); // Ensure two-digit day
       const formattedDate = `${year}-${month}-${day}`;
       const seedFromDate = generateSeedFromDate(new Date(formattedDate));
-      console.log(
-        'YMD is ',
-        year,
-        month,
-        day,
-        'so',
-        seedFromDate,
-        'from',
-        formattedDate
-      );
       setSeed(seedFromDate);
       populateGrid(gridSize, seedFromDate);
       setInputSeed('');

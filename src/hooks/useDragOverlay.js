@@ -34,18 +34,3 @@ export const useDragOverlay = () => {
     updatePosition,
   };
 };
-
-// import { create } from "zustand";
-
-// export const useDragOverlay = create((set) => ({
-//   isDragging: false,
-//   dragLetter: null,
-//   dragX: 0,
-//   dragY: 0,
-//   startDragging: (letter) =>
-//     set(() => ({ isDragging: true, dragLetter: letter })),
-//   updatePosition: (x, y) =>
-//     set(() => ({ dragX: x, dragY: y })),
-//   stopDragging: () =>
-//     set(() => ({ isDragging: false, dragLetter: null, dragX: 0, dragY: 0 })),
-// }));
