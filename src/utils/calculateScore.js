@@ -19,6 +19,8 @@ export const calculateScore = (
 
   let totalScore = 0;
   let wordCount = 0;
+  const scoringPositions = []; // Track all positions contributing to scores
+  const wordList = []; // Track valid words and their scores
 
   const calculateWordScore = (word) => {
     let scorelen = word.length - 1;
@@ -33,6 +35,7 @@ export const calculateScore = (
       let word = '';
       let nx = x;
       let ny = y;
+      const positions = [];
 
       // Get the character before the starting position
       const prevChar =
@@ -51,6 +54,7 @@ export const calculateScore = (
         grid[nx][ny]
       ) {
         word += grid[nx][ny];
+        positions.push([nx, ny]);
         nx += dx;
         ny += dy;
 
@@ -61,8 +65,11 @@ export const calculateScore = (
             : null;
 
         if (isWordValid(word, prevChar, nextChar)) {
-          totalScore += calculateWordScore(word); // Add word score
+          const wordScore = calculateWordScore(word);
+          totalScore += wordScore;
           wordCount++;
+          scoringPositions.push(...positions); // Add contributing positions
+          wordList.push({ word, score: wordScore });
           console.log('Scoring', word, 'total now', totalScore);
         }
       }
@@ -75,7 +82,9 @@ export const calculateScore = (
     }
   }
 
-  return { score: totalScore, wordCount };
+  console.log('Final Scoring Positions:', scoringPositions);
+  console.log('Final Word List:', wordList);
+  return { score: totalScore, wordCount, scoringPositions, wordList };
 };
 
 // Fibonacci helper function

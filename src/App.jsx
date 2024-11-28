@@ -7,28 +7,38 @@ import SeedControl from './components/SeedControl';
 import { useGameState } from './hooks/useGameState';
 import CustomDragLayer from './components/CustomDragLayer';
 import { generateSeedRandom } from './utils/seedUtils';
+import WordOverlay from './components/WordOverlay';
 
-function App() {
-  const gridSize = 6;
-  const { setDictionary, populateGrid } = useGameState();
-  const isInitialized = useRef(false);
+const App = () => {
+  const {
+    isInitialized,
+    setInitialized,
+    populateGrid,
+    setDictionary,
+    gridSize,
+    wordList,
+  } = useGameState();
+
+  // need to get this back through!  const gridSize = 6;
 
   useEffect(() => {
-    const loadDictionary = async () => {
-      const response = await fetch('/assets/enable.txt');
-      const text = await response.text();
-      const words = text.split('\n').map((word) => word.trim().toUpperCase());
-      setDictionary(words);
+    if (!isInitialized) {
+      const loadDictionary = async () => {
+        const response = await fetch('/assets/enable.txt');
+        const text = await response.text();
+        const words = text.split('\n').map((word) => word.trim().toUpperCase());
+        setDictionary(words);
 
-      if (!isInitialized.current) {
-        const randomSeed = generateSeedRandom();
-        populateGrid(gridSize, randomSeed);
-        isInitialized.current = true;
-      }
-    };
+        if (!isInitialized.current) {
+          const randomSeed = generateSeedRandom();
+          populateGrid(gridSize, randomSeed);
+          setInitialized(true);
+        }
+      };
 
-    loadDictionary();
-  }, [setDictionary, populateGrid, gridSize]);
+      loadDictionary();
+    }
+  }, [isInitialized, setDictionary, populateGrid, gridSize, setInitialized]);
 
   return (
     <DndProvider backend={HTML5Backend}>
@@ -38,9 +48,10 @@ function App() {
         <ScoreDisplay />
         <GameBoard gridSize={gridSize} />
         <SeedControl gridSize={gridSize} />
+        <WordOverlay wordList={wordList} />
       </div>
     </DndProvider>
   );
-}
+};
 
 export default App;

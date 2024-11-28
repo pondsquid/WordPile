@@ -1,9 +1,6 @@
-ok 
-  1. generateSeedFromDate is broken somehow, and we should use that in both places not inline in the other
-  2. then work on enter and keeping old value etc etc
-  3. then maybe on to word display etc- maybe we could reupload and have that work, who knows
-   
-
+1. Double Init is back!
+2. Red Letter not happening in the internal of word display (also scoring??)
+3. My solution to have the popup go away is bad!
 
 
 Show which tiles are part of words - borders on the tiles?

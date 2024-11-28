@@ -1,10 +1,16 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useDrop } from 'react-dnd';
 import LetterTile from './LetterTile';
 import { useGameState } from '../hooks/useGameState';
 
-const GameBoard = ({ gridSize = 6 }) => {
-  const { letterGrid, scoringPositions } = useGameState();
+// was const GameBoard = ({ gridSize = 6 }) => {
+const GameBoard = () => {
+  const { gridSize, letterGrid, scoringPositions, populateGrid } =
+    useGameState();
+
+  useEffect(() => {
+    populateGrid(gridSize);
+  }, [gridSize, populateGrid]);
 
   return (
     <div className="flex flex-col items-center">
@@ -32,15 +38,14 @@ const GameBoard = ({ gridSize = 6 }) => {
   );
 };
 
-const GridSquare = ({ position, letter }) => {
+const GridSquare = ({ position, letter, isScoring }) => {
   const { moveLetter, letterGrid } = useGameState(); // Access state and actions
+  const [row, col] = position;
 
   const [, drop] = useDrop(
     () => ({
       accept: 'tile',
-      drop: (item) => {
-        moveLetter(item.position, position); // Handle moves and swaps
-      },
+      drop: (item) => moveLetter(item.position, position), // Handle moves and swaps
       canDrop: () => true, // Always allow drops
     }),
     [letterGrid] // Dependency ensures latest state
@@ -49,9 +54,13 @@ const GridSquare = ({ position, letter }) => {
   return (
     <div
       ref={drop}
-      className="w-16 h-16 border-2 border-gray-400 flex items-center justify-center bg-white"
+      className={`w-16 h-16 border-2 flex items-center justify-center ${
+        isScoring ? 'border-green-500' : 'border-gray-400'
+      }`}
     >
-      {letter && <LetterTile letter={letter} position={position} />}
+      {letterGrid[row]?.[col] && (
+        <LetterTile letter={letterGrid[row][col]} position={[row, col]} />
+      )}
     </div>
   );
 };

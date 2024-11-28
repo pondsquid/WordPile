@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useGameState } from '../hooks/useGameState';
 import {
   generateSeedFromDate,
@@ -110,7 +110,8 @@ const SeedControl = () => {
             onChange={(e) => setInputSeed(e.target.value)}
             onKeyDown={handleKeyDown}
             className="px-4 py-2 border rounded-md"
-            placeholder="Enter hex seed or date"
+            placeholder="Seed (hex|YYYY-MM-DD)"
+            autoComplete="on"
           />
           <button
             onClick={handleConfirmSeed}
