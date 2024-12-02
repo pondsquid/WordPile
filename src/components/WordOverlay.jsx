@@ -1,8 +1,9 @@
 import React from 'react';
 import { useGameState } from '../hooks/useGameState';
 
-const WordOverlay = ({ wordList = [], onClose, leastUsedLetter }) => {
-  const { isShowingWordList, setShowingWordList } = useGameState();
+const WordOverlay = ({ wordList = [], onClose }) => {
+  const { isShowingWordList, setShowingWordList, getLeastUsedLetter } =
+    useGameState();
 
   if (!isShowingWordList) {
     return null;
@@ -22,7 +23,7 @@ const WordOverlay = ({ wordList = [], onClose, leastUsedLetter }) => {
         onClick={(e) => e.stopPropagation()} // Prevent close on content click
         style={{ maxHeight: '90vh', overflowY: 'auto' }}
       >
-        {wordList.length == 0 ? (
+        {wordList.length === 0 ? (
           <div className="text-xl font-bold bg-blue-200">No Words Found</div>
         ) : (
           wordList
@@ -34,9 +35,9 @@ const WordOverlay = ({ wordList = [], onClose, leastUsedLetter }) => {
                     <span
                       key={i}
                       className={
-                        char === leastUsedLetter
+                        char === getLeastUsedLetter()
                           ? 'text-red-500 font-bold'
-                          : 'font-bold'
+                          : 'text-green-500 font-bold'
                       }
                     >
                       {char}

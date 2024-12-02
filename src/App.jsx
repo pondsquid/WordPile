@@ -22,6 +22,7 @@ const App = () => {
   // need to get this back through!  const gridSize = 6;
 
   useEffect(() => {
+    console.log('In App useEffect iI', isInitialized);
     if (!isInitialized) {
       const loadDictionary = async () => {
         const response = await fetch('/assets/enable.txt');
@@ -43,13 +44,17 @@ const App = () => {
   return (
     <DndProvider backend={HTML5Backend}>
       <CustomDragLayer />
-      <div className="min-h-screen bg-gray-100 flex flex-col items-center">
-        <h1 className="text-2xl font-bold my-4">Word Game</h1>
-        <ScoreDisplay />
-        <GameBoard gridSize={gridSize} />
-        <SeedControl gridSize={gridSize} />
-        <WordOverlay wordList={wordList} />
-      </div>
+      {isInitialized ? (
+        <div className="min-h-screen bg-gray-100 flex flex-col items-center">
+          <h1 className="text-2xl font-bold my-4">Word Game</h1>
+          <ScoreDisplay />
+          <GameBoard gridSize={gridSize} />
+          <SeedControl gridSize={gridSize} />
+          <WordOverlay wordList={wordList} />
+        </div>
+      ) : (
+        <h3 className="text-2xl font-bold my-4">...Loading...</h3>
+      )}
     </DndProvider>
   );
 };
