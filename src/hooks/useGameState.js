@@ -18,6 +18,12 @@ export const useGameState = create((set, get) => ({
   turn: 1, // Turn counter
   isInitialized: false, // Initialization flag
   isShowingWordList: false,
+  isShowingLeaderboard: false,
+  scores: [
+    { score: 7, username: 'Harold' },
+    { score: 13, username: 'Maude' },
+    { score: 5, username: 'Jane' },
+  ],
 
   // Get the least-used letter for scoring bonuses
   getLeastUsedLetter: () => {
@@ -37,6 +43,7 @@ export const useGameState = create((set, get) => ({
   setInitialized: (value) => set(() => ({ isInitialized: value })),
   setLetterGrid: (grid) => set({ letterGrid: grid }),
   setShowingWordList: (show) => set({ isShowingWordList: show }),
+  setShowingLeaderboard: (show) => set({ isShowingLeaderboard: show }),
 
   // Increment the turn counter
   nextTurn: () => set((state) => ({ turn: state.turn + 1 })),
