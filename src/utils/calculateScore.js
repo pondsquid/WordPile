@@ -4,12 +4,20 @@ export const calculateScore = (
   leastUsedLetter,
   minWordLength = 3
 ) => {
+  // const directions = [
+  //   [0, 1], // Horizontal
+  //   [1, 0], // Vertical
+  //   [1, 1], // Diagonal down-right
+  //   [1, -1], // Diagonal down-left
+  // ];
   const directions = [
     [0, 1], // Horizontal
     [1, 0], // Vertical
     [1, 1], // Diagonal down-right
-    [1, -1], // Diagonal down-left
+    [-1, 1], // Diagonal down-left
   ];
+  // bugs, on screen the angles are down-right and down-left
+  // assume the issue is the coord systems are wrong everywhere
 
   const isWordValid = (word, prevChar, nextChar) =>
     word.length >= minWordLength &&
